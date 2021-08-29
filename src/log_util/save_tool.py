@@ -5,7 +5,8 @@ from datetime import datetime
 
 def gen_file_prefix(model_name, date=None):
     date_now = datetime.now().strftime("%m-%d-%H:%M:%S") if not date else date
-    file_path = os.path.join(config.PRO_ROOT / 'saved_models' / '_'.join((date_now, model_name)))
+    #file_path = os.path.join(config.PRO_ROOT / 'saved_models' / '_'.join((date_now, model_name)))
+    file_path = os.path.join(config.PRO_ROOT / 'saved_models' / model_name)
     if not os.path.exists(file_path):
         os.makedirs(file_path)
     return file_path, date_now

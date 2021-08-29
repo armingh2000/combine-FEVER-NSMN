@@ -25,12 +25,21 @@ from nn_doc_retrieval import nn_doc_model
 PIPELINE_DIR = config.RESULT_PATH / "pipeline_r_aaai_doc"
 
 default_model_path_dict: Dict[str, str] = {
-    'sselector': config.PRO_ROOT / 'saved_models/saved_sselector/i(57167)_epoch(6)_(tra_score:0.8850885088508851|raw_acc:1.0|pr:0.3834395939593578|rec:0.8276327632763276|f1:0.5240763176570098)_epoch',
-    'sselector_1': config.PRO_ROOT / 'saved_models/saved_sselector/i(77083)_epoch(7)_(tra_score:0.8841384138413841|raw_acc:1.0|pr:0.3964771477147341|rec:0.8262076207620762|f1:0.5358248492912955)_epoch',
-    'sselector_2': config.PRO_ROOT / 'saved_models/saved_sselector/i(58915)_epoch(7)_(tra_score:0.8838383838383839|raw_acc:1.0|pr:0.39771352135209675|rec:0.8257575757575758|f1:0.5368577222846761)_epoch',
+    'sselector': config.PRO_ROOT / 'saved_models/nn_ss',
+    'sselector_1': config.PRO_ROOT / 'saved_models/nn_ss1',
+    'sselector_2': config.PRO_ROOT / 'saved_models/nn_ss2',
+    'nn_doc_selector': config.PRO_ROOT / 'saved_models/nn_doc',
+    'no_doc_nli': config.PRO_ROOT / 'saved_models/nn_nli'
+}
 
-    'nn_doc_selector': config.PRO_ROOT / 'saved_models/nn_doc_selector/i(9000)_epoch(1)_(tra_score:0.9212421242124212|pr:0.4299679967996279|rec:0.8818631863186318|f1:0.5780819247968391)',
-    'no_doc_nli': config.PRO_ROOT / 'saved_models/saved_nli_m/i(77000)_epoch(11)_dev(0.6601160116011601)_loss(1.1138329989302813)_seed(12)',
+
+# default_model_path_dict: Dict[str, str] = {
+#     'sselector': config.PRO_ROOT / 'saved_models/saved_sselector/i(57167)_epoch(6)_(tra_score:0.8850885088508851|raw_acc:1.0|pr:0.3834395939593578|rec:0.8276327632763276|f1:0.5240763176570098)_epoch',
+#     'sselector_1': config.PRO_ROOT / 'saved_models/saved_sselector/i(77083)_epoch(7)_(tra_score:0.8841384138413841|raw_acc:1.0|pr:0.3964771477147341|rec:0.8262076207620762|f1:0.5358248492912955)_epoch',
+#     'sselector_2': config.PRO_ROOT / 'saved_models/saved_sselector/i(58915)_epoch(7)_(tra_score:0.8838383838383839|raw_acc:1.0|pr:0.39771352135209675|rec:0.8257575757575758|f1:0.5368577222846761)_epoch',
+#
+#     'nn_doc_selector': config.PRO_ROOT / 'saved_models/nn_doc_selector/i(9000)_epoch(1)_(tra_score:0.9212421242124212|pr:0.4299679967996279|rec:0.8818631863186318|f1:0.5780819247968391)',
+#     'no_doc_nli': config.PRO_ROOT / 'saved_models/saved_nli_m/i(77000)_epoch(11)_dev(0.6601160116011601)_loss(1.1138329989302813)_seed(12)',
 
 
     # 'no_doc_nli_1': config.PRO_ROOT / 'saved_models/saved_v1_2/i(74000)_epoch(11)_dev(0.6546654665466547)_loss(1.3616722218274284)_seed(12)',
