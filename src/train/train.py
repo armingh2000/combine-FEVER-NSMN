@@ -1,3 +1,4 @@
+import nn_doc_retrieval
 from nn_doc_retrieval.nn_doc_model import *
 # from sentence_retrieval.simple_nnmodel import *
 # from nli.mesim_wn_simi_v1_2 import *

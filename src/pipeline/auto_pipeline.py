@@ -52,8 +52,8 @@ default_model_path_dict: Dict[str, str] = {
     # 'nli_3': config.PRO_ROOT / 'saved_models/saved_v1_2/i(85500)_epoch(13)_dev(0.6578657865786579)_loss(1.7740270915371452)_seed(12)',
     # 'nli_4': config.PRO_ROOT / 'saved_models/saved_v1_2/i(77000)_epoch(11)_dev(0.6552155215521552)_loss(1.5343008287871691)_seed(12)',
 
-    'nli_ema_0': config.PRO_ROOT / "saved_models/ema_nli/ema_i(64500)_epoch(9)_dev(0.6601160116011601)_lacc(0.6968696869686969)_seed(12)"
-}
+    #'nli_ema_0': config.PRO_ROOT / "saved_models/ema_nli/ema_i(64500)_epoch(9)_dev(0.6601160116011601)_lacc(0.6968696869686969)_seed(12)"
+#}
 
 
 # Sentence selection ensemble
