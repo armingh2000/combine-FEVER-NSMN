@@ -1,6 +1,6 @@
 
 def train_nn_doc(exp_iter, exp_epoch, model_name):
-    import * from nn_doc_retrieval.nn_doc_model
+    from nn_doc_retrieval.nn_doc_model import *
 
 
     num_epoch = 10
@@ -156,7 +156,7 @@ def train_nn_doc(exp_iter, exp_epoch, model_name):
 
 
 def train_nn_sent(exp_iter, exp_epoch, model_name):
-    import * from sentence_retrieval.simple_nnmodel
+    from sentence_retrieval.simple_nnmodel import *
 
 
     num_epoch = 10
@@ -314,7 +314,7 @@ def train_nn_sent(exp_iter, exp_epoch, model_name):
 
 
 def train_nn_nli(exp_iter, exp_epoch, model_name):
-    import * from nli.mesim_wn_simi_v1_2
+    from nli.mesim_wn_simi_v1_2 import *
 
 
     num_epoch = 12
