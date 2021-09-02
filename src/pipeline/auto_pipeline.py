@@ -636,7 +636,7 @@ def post_process():
 
 
 if __name__ == '__main__':
-    pipeline(config.DATA_ROOT / "fever/shared_task_train.jsonl",
-             eval_file=config.DATA_ROOT / "fever/shared_task_train.jsonl",
+    pipeline(config.DATA_ROOT / "fever/train.jsonl",
+             eval_file=config.DATA_ROOT / "fever/train.jsonl",
              model_path_dict=default_model_path_dict,
              steps=default_steps)
