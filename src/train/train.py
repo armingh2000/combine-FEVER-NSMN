@@ -16,7 +16,7 @@ def train_nn_doc(exp_iter, exp_epoch, model_name):
     # sample_prob_decay = 0.05
 
     dev_upstream_file = config.RESULT_PATH / "results/pipeline_r_aaai_doc/2021_08_22_13\:03\:04_r/doc_retr1_shared_task_dev.jsonl"
-    train_upstream_file = config.RESULT_PATH / "results/pipeline_r_aaai_doc/date/doc_retr1_shared_task_train.jsonl"
+    train_upstream_file = config.RESULT_PATH / "results/pipeline_r_aaai_doc/2021_09_02_16\:31\02_r/doc_retr1_shared_task_train.jsonl"
     dev_data_list = common.load_jsonl(dev_upstream_file)
 
     # Prepare Data
