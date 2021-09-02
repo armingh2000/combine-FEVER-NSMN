@@ -122,26 +122,26 @@ default_steps = {
     },
 
     's2.2.1doc_nn_retri': {
-        'do': True,
+        'do': False,
         'out_file': 'None'
     },
 
     's3.1sen_select': {
-        'do': True,
+        'do': False,
         'out_file': 'None',
         'ensemble': True,
     },
 
     's4.2doc_retri': {
-        'do': True,
+        'do': False,
         'out_file': 'None'
     },
     's5.2sen_select': {
-        'do': True,
-        'out_file': 'NOne'
+        'do': False,
+        'out_file': 'None'
     },
     's6.nli': {
-        'do': True,
+        'do': False,
         'out_file': config.RESULT_PATH / "pipeline_r_aaai_doc/2018_09_02_17:11:42_r/nli_r_shared_task_dev_no_doc_scale:0.05.jsonl"
     }
 }
@@ -636,7 +636,7 @@ def post_process():
 
 
 if __name__ == '__main__':
-    pipeline(config.DATA_ROOT / "fever/shared_task_dev.jsonl",
-             eval_file=config.DATA_ROOT / "fever/shared_task_dev.jsonl",
+    pipeline(config.DATA_ROOT / "fever/shared_task_train.jsonl",
+             eval_file=config.DATA_ROOT / "fever/shared_task_train.jsonl",
              model_path_dict=default_model_path_dict,
              steps=default_steps)

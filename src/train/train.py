@@ -1,4 +1,3 @@
-import nn_doc_retrieval
 from nn_doc_retrieval.nn_doc_model import *
 # from sentence_retrieval.simple_nnmodel import *
 # from nli.mesim_wn_simi_v1_2 import *
@@ -16,8 +15,8 @@ def train_nn_doc(exp_iter, exp_epoch, model_name):
     # keep_neg_sample_prob = 0.4
     # sample_prob_decay = 0.05
 
-    dev_upstream_file = config.RESULT_PATH / "doc_retri_bls/docretri.basic.nopageview/dev.jsonl"
-    train_upstream_file = config.RESULT_PATH / "doc_retri_bls/docretri.basic.nopageview/train.jsonl"
+    dev_upstream_file = config.RESULT_PATH / "results/pipeline_r_aaai_doc/2021_08_22_13\:03\:04_r/doc_retr1_shared_task_dev.jsonl"
+    train_upstream_file = config.RESULT_PATH / "results/pipeline_r_aaai_doc/date/doc_retr1_shared_task_train.jsonl"
     dev_data_list = common.load_jsonl(dev_upstream_file)
 
     # Prepare Data
