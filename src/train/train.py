@@ -1,5 +1,5 @@
-from nn_doc_retrieval.nn_doc_model import *
-# from sentence_retrieval.simple_nnmodel import *
+# from nn_doc_retrieval.nn_doc_model import *vv
+from sentence_retrieval.simple_nnmodel import *
 # from nli.mesim_wn_simi_v1_2 import *
 
 
@@ -165,8 +165,8 @@ def train_nn_sent(exp_iter, exp_epoch, model_name):
     keep_neg_sample_prob = 0.4
     sample_prob_decay = 0.05
 
-    dev_upstream_file = config.RESULT_PATH / "doc_retri/cn_util_Jul17_docretri.singularize/dev.jsonl"
-    train_upstream_file = config.RESULT_PATH / "doc_retri/cn_util_Jul17_docretri.singularize/train.jsonl"
+    dev_upstream_file = config.RESULT_PATH / "pipeline_r_aaai_doc/2021_08_22_13:03:04_r/doc_retr_1_shared_task_dev.jsonl"
+    train_upstream_file = config.RESULT_PATH / "pipeline_r_aaai_doc/2021_09_02_16:31:02_r/doc_retr_1_train.jsonl"
 
     # Prepare Data
     token_indexers = {
