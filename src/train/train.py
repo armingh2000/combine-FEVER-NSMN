@@ -463,8 +463,8 @@ def train_nn_nli(exp_iter, exp_epoch, model_name):
 
 
 if __name__ == '__main__':
-    train_nn_doc(9000, 1, 'nn_doc')
-    #train_nn_sent(57167, 6, 'nn_ss')
-    #train_nn_sent(77083, 7, 'nn_ss1')
-    #train_nn_sent(58915, 7, 'nn_ss2')
+    #train_nn_doc(9000, 1, 'nn_doc')
+    train_nn_sent(57167, 6, 'nn_ss')
+    train_nn_sent(77083, 7, 'nn_ss1')
+    train_nn_sent(58915, 7, 'nn_ss2')
     #train_nn_nli(77000, 11, 'nn_nli')
