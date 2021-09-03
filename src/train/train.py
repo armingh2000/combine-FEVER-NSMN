@@ -159,7 +159,7 @@ def train_nn_doc(exp_iter, exp_epoch, model_name):
 def train_nn_sent(exp_iter, exp_epoch, model_name):
     num_epoch = 10
     seed = 12
-    batch_size = 128
+    batch_size = 64
     lazy = True
     torch.manual_seed(seed)
     keep_neg_sample_prob = 0.4
