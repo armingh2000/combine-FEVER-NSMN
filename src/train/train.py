@@ -230,7 +230,7 @@ def train_nn_sent(exp_iter, exp_epoch, model_name):
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=start_lr)
     criterion = nn.CrossEntropyLoss()
 
-    epoch_limit, terminate = False
+    epoch_limit = terminate = False
 
     for i_epoch in range(num_epoch):
         if i_epoch == exp_epoch:
