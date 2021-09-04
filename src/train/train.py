@@ -269,7 +269,7 @@ def train_nn_sent(exp_iter, exp_epoch, model_name):
 
                 dev_results_list = score_converter_v0(config.T_FEVER_DEV_JSONL, complete_upstream_dev_data)
                 eval_mode = {'check_sent_id_correct': True, 'standard': True}
-                strict_score, acc_score, pr, rec, f1 = c_scorer.fever_score(dev_results_list, config.T_FEVER_DEV_JSONL,
+                strict_score, acc_score, pr, rec, f1 = c_scorer.fever_score(dev_results_list, dev_results_list,
                                                                             mode=eval_mode, verbose=False)
                 total = len(dev_results_list)
                 hit = eval_mode['check_sent_id_correct_hits']
@@ -297,7 +297,7 @@ def train_nn_sent(exp_iter, exp_epoch, model_name):
 
         dev_results_list = score_converter_v0(config.T_FEVER_DEV_JSONL, complete_upstream_dev_data)
         eval_mode = {'check_sent_id_correct': True, 'standard': True}
-        strict_score, acc_score, pr, rec, f1 = c_scorer.fever_score(dev_results_list, config.T_FEVER_DEV_JSONL,
+        strict_score, acc_score, pr, rec, f1 = c_scorer.fever_score(dev_results_list, dev_results_list,
                                                                     mode=eval_mode, verbose=False)
         total = len(dev_results_list)
         hit = eval_mode['check_sent_id_correct_hits']
