@@ -3,7 +3,7 @@ from sentence_retrieval.simple_nnmodel import *
 # from nli.mesim_wn_simi_v1_2 import *
 
 
-def train_nn_doc(exp_iter, exp_epoch, model_name):
+def train_nn_doc(model_name):
     num_epoch = 10
     seed = 12
     batch_size = 64
@@ -18,6 +18,7 @@ def train_nn_doc(exp_iter, exp_epoch, model_name):
     dev_upstream_file = config.RESULT_PATH / "pipeline_r_aaai_doc/2021_08_22_13:03:04_r/doc_retr_1_shared_task_dev.jsonl"
     train_upstream_file = config.RESULT_PATH / "pipeline_r_aaai_doc/2021_09_02_16:31:02_r/doc_retr_1_train.jsonl"
     dev_data_list = common.load_jsonl(dev_upstream_file)
+    train_data_list = common.load_jsonl(train_upstream_file)
 
     # Prepare Data
     token_indexers = {
@@ -26,11 +27,10 @@ def train_nn_doc(exp_iter, exp_epoch, model_name):
     }
 
     train_fever_data_reader = SSelectorReader(token_indexers=token_indexers, lazy=lazy, max_l=180)
-    # dev_fever_data_reader = SSelectorReader(token_indexers=token_indexers, lazy=False)
     dev_fever_data_reader = SSelectorReader(token_indexers=token_indexers, lazy=lazy, max_l=180)
 
     cursor = fever_db.get_cursor()
-    complete_upstream_dev_data = disamb.sample_disamb_inference(common.load_jsonl(dev_upstream_file), cursor,
+    complete_upstream_dev_data = disamb.sample_disamb_inference(dev_data_list, cursor,
                                                                 contain_first_sentence=contain_first_sentence)
     print("Dev size:", len(complete_upstream_dev_data))
     dev_instances = dev_fever_data_reader.read(complete_upstream_dev_data)
@@ -55,7 +55,6 @@ def train_nn_doc(exp_iter, exp_epoch, model_name):
     biterator.index_with(vocab)
     dev_biterator.index_with(vocab)
 
-    # exit(0)
     # Build Model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu", index=0)
     device_num = -1 if device.type == 'cpu' else 0
@@ -83,15 +82,10 @@ def train_nn_doc(exp_iter, exp_epoch, model_name):
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=start_lr)
     criterion = nn.CrossEntropyLoss()
 
-    epoch_limit = terminate = False
-
     for i_epoch in range(num_epoch):
-        if i_epoch == exp_epoch:
-            epoch_limit = True
-
         print("Resampling...")
         # Resampling
-        complete_upstream_train_data = disamb.sample_disamb_training_v0(common.load_jsonl(train_upstream_file),
+        complete_upstream_train_data = disamb.sample_disamb_training_v0(train_data_list,
                                                                         cursor, pn_ratio, contain_first_sentence,
                                                                         only_found=False)
         random.shuffle(complete_upstream_train_data)
@@ -114,8 +108,12 @@ def train_nn_doc(exp_iter, exp_epoch, model_name):
             optimizer.step()
             iteration += 1
 
+            if i_epoch <= 5:
+                mod = 1000
+            else:
+                mod = 500
 
-            if epoch_limit and iteration == exp_iter:
+            if iteration % mod == 0:
 
                 eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
                 complete_upstream_dev_data = hidden_eval(model, eval_iter, complete_upstream_dev_data)
@@ -128,16 +126,19 @@ def train_nn_doc(exp_iter, exp_epoch, model_name):
                 print("Strict score:", oracle_score)
                 print(f"Eval Tracking score:", f"{oracle_score}")
 
+                need_save = False
+                if oracle_score > best_dev:
+                    best_dev = oracle_score
+                    need_save = True
 
-                save_path = os.path.join(
-                    file_path_prefix,
-                    f'i({iteration})_epoch({i_epoch})_'
-                    f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
-                )
+                if need_save:
+                    save_path = os.path.join(
+                        file_path_prefix,
+                        f'i({iteration})_epoch({i_epoch})_'
+                        f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
+                    )
 
-                torch.save(model.state_dict(), save_path)
-                terminate = True
-                break
+                    torch.save(model.state_dict(), save_path)
 
         #
         print("Epoch Evaluation...")
@@ -152,11 +153,22 @@ def train_nn_doc(exp_iter, exp_epoch, model_name):
         print("Strict score:", oracle_score)
         print(f"Eval Tracking score:", f"{oracle_score}")
 
-        if terminate:
-            break
+        need_save = False
+        if oracle_score > best_dev:
+            best_dev = oracle_score
+            need_save = True
+
+        if need_save:
+            save_path = os.path.join(
+                file_path_prefix,
+                f'i({iteration})_epoch({i_epoch})_e'
+                f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
+            )
+
+            torch.save(model.state_dict(), save_path)
 
 
-def train_nn_sent(exp_iter, exp_epoch, model_name):
+def train_nn_sent(model_name):
     num_epoch = 10
     seed = 12
     batch_size = 64
@@ -175,7 +187,6 @@ def train_nn_sent(exp_iter, exp_epoch, model_name):
     }
 
     train_fever_data_reader = SSelectorReader(token_indexers=token_indexers, lazy=lazy, max_l=180)
-    # dev_fever_data_reader = SSelectorReader(token_indexers=token_indexers, lazy=False)
     dev_fever_data_reader = SSelectorReader(token_indexers=token_indexers, lazy=lazy, max_l=180)
 
     complete_upstream_dev_data = get_full_list(config.T_FEVER_DEV_JSONL, dev_upstream_file, pred=True)
@@ -202,7 +213,6 @@ def train_nn_sent(exp_iter, exp_epoch, model_name):
     biterator.index_with(vocab)
     dev_biterator.index_with(vocab)
 
-    # exit(0)
     # Build Model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu", index=0)
     device_num = -1 if device.type == 'cpu' else 0
@@ -230,12 +240,7 @@ def train_nn_sent(exp_iter, exp_epoch, model_name):
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=start_lr)
     criterion = nn.CrossEntropyLoss()
 
-    epoch_limit = terminate = False
-
     for i_epoch in range(num_epoch):
-        if i_epoch == exp_epoch:
-            epoch_limit = True
-
         print("Resampling...")
         # Resampling
         complete_upstream_train_data = get_full_list(config.T_FEVER_TRAIN_JSONL, train_upstream_file, pred=False)
@@ -263,7 +268,12 @@ def train_nn_sent(exp_iter, exp_epoch, model_name):
             optimizer.step()
             iteration += 1
 
-            if epoch_limit and iteration == exp_iter:
+            if i_epoch <= 7:
+                mod = 20000
+            else:
+                mod = 8000
+
+            if iteration % mod == 0:
                 eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
                 complete_upstream_dev_data = hidden_eval(model, eval_iter, complete_upstream_dev_data)
 
@@ -279,17 +289,20 @@ def train_nn_sent(exp_iter, exp_epoch, model_name):
                 print("Strict score:", strict_score)
                 print(f"Eval Tracking score:", f"{tracking_score}")
 
+                need_save = False
+                if tracking_score > best_dev:
+                    best_dev = tracking_score
+                    need_save = True
 
-                save_path = os.path.join(
-                    file_path_prefix,
-                    f'i({iteration})_epoch({i_epoch})_'
-                     f'(tra_score:{tracking_score}|raw_acc:{acc_score}|pr:{pr}|rec:{rec}|f1:{f1})'
-                )
+                if need_save:
+                    save_path = os.path.join(
+                        file_path_prefix,
+                        f'i({iteration})_epoch({i_epoch})_'
+                        f'(tra_score:{tracking_score}|raw_acc:{acc_score}|pr:{pr}|rec:{rec}|f1:{f1})'
+                    )
 
-                torch.save(model.state_dict(), save_path)
+                    torch.save(model.state_dict(), save_path)
 
-                terminate = True
-                break
 
         print("Epoch Evaluation...")
         eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
@@ -307,11 +320,19 @@ def train_nn_sent(exp_iter, exp_epoch, model_name):
         print("Strict score:", strict_score)
         print(f"Eval Tracking score:", f"{tracking_score}")
 
-        if terminate:
-            break
+        if tracking_score > best_dev:
+            best_dev = tracking_score
+
+            save_path = os.path.join(
+                file_path_prefix,
+                f'i({iteration})_epoch({i_epoch})_'
+                f'(tra_score:{tracking_score}|raw_acc:{acc_score}|pr:{pr}|rec:{rec}|f1:{f1})_epoch'
+            )
+
+            torch.save(model.state_dict(), save_path)
 
 
-def train_nn_nli(exp_iter, exp_epoch, model_name):
+def train_nn_nli(model_name):
     num_epoch = 12
     seed = 12
     batch_size = 32
@@ -329,13 +350,6 @@ def train_nn_nli(exp_iter, exp_epoch, model_name):
 
     train_upstream_sent_list = common.load_jsonl(config.RESULT_PATH /
                                                  "sent_retri_nn/2018_07_20_15:17:59_r/train_sent.jsonl")
-
-    # Mac OS
-    # dev_upstream_sent_list = common.load_jsonl(config.RESULT_PATH /
-    #                                            "sent_retri_nn/2018_07_20_15-17-59_r/dev_sent.jsonl")
-    #
-    # train_upstream_sent_list = common.load_jsonl(config.RESULT_PATH /
-    #                                              "sent_retri_nn/2018_07_20_15-17-59_r/train_sent.jsonl")
 
     # Prepare Data
     token_indexers = {
@@ -409,12 +423,8 @@ def train_nn_nli(exp_iter, exp_epoch, model_name):
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=start_lr)
     criterion = nn.CrossEntropyLoss()
 
-    epoch_limit, terminate = False
 
     for i_epoch in range(num_epoch):
-        if i_epoch == exp_epoch:
-            epoch_limit = True
-
         print("Resampling...")
         # Resampling
         train_data_with_candidate_sample_list = \
@@ -443,19 +453,31 @@ def train_nn_nli(exp_iter, exp_epoch, model_name):
             optimizer.step()
             iteration += 1
 
+            if i_epoch <= 6:
+                # mod = 5000
+                mod = 10000
+            else:
+                mod = 500
 
-            if epoch_limit and iteration == exp_iter:
+            if iteration % mod == 0:
                 eval_iter = biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
                 dev_score, dev_loss = full_eval_model(model, eval_iter, criterion, complete_upstream_dev_data)
 
                 print(f"Dev:{dev_score}/{dev_loss}")
 
-                save_path = os.path.join(
-                    file_path_prefix,
-                    f'i({iteration})_epoch({i_epoch})_dev({dev_score})_loss({dev_loss})_seed({seed})'
-                )
+                need_save = False
+                if dev_score > best_dev:
+                    best_dev = dev_score
+                    need_save = True
 
-                torch.save(model.state_dict(), save_path)
+                if need_save:
+                    save_path = os.path.join(
+                        file_path_prefix,
+                        f'i({iteration})_epoch({i_epoch})_dev({dev_score})_loss({dev_loss})_seed({seed})'
+                    )
+
+                    torch.save(model.state_dict(), save_path)
+
 
         # Save some cache wordnet feature.
         wn_persistent_api.persistence_update(p_dict)
@@ -463,8 +485,10 @@ def train_nn_nli(exp_iter, exp_epoch, model_name):
 
 
 if __name__ == '__main__':
+    train_nn_doc('nn_doc')
+
     #train_nn_doc(9000, 1, 'nn_doc')
-    train_nn_sent(57167, 6, 'nn_ss')
-    train_nn_sent(77083, 7, 'nn_ss1')
-    train_nn_sent(58915, 7, 'nn_ss2')
+    #train_nn_sent(57167, 6, 'nn_ss')
+    #train_nn_sent(77083, 7, 'nn_ss1')
+    #train_nn_sent(58915, 7, 'nn_ss2')
     #train_nn_nli(77000, 11, 'nn_nli')
