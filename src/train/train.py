@@ -1,5 +1,6 @@
-# from nn_doc_retrieval.nn_doc_model import *vv
-from sentence_retrieval.simple_nnmodel import *
+from tqdm.auto import trange
+from nn_doc_retrieval.nn_doc_model import *
+#from sentence_retrieval.simple_nnmodel import *
 # from nli.mesim_wn_simi_v1_2 import *
 
 
@@ -240,7 +241,7 @@ def train_nn_sent(model_name):
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=start_lr)
     criterion = nn.CrossEntropyLoss()
 
-    for i_epoch in range(num_epoch):
+    for i_epoch in trange(num_epoch, desc="epoch"):
         print("Resampling...")
         # Resampling
         complete_upstream_train_data = get_full_list(config.T_FEVER_TRAIN_JSONL, train_upstream_file, pred=False)
@@ -255,7 +256,7 @@ def train_nn_sent(model_name):
         sampled_train_instances = train_fever_data_reader.read(filtered_train_data)
 
         train_iter = biterator(sampled_train_instances, shuffle=True, num_epochs=1, cuda_device=device_num)
-        for i, batch in tqdm(enumerate(train_iter)):
+        for i, batch in trange(enumerate(train_iter), desc="iteration"):
             model.train()
             out = model(batch)
             y = batch['selection_label']
