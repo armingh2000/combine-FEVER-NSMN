@@ -96,7 +96,7 @@ def train_nn_doc(model_name):
         sampled_train_instances = train_fever_data_reader.read(complete_upstream_train_data)
 
         train_iter = biterator(sampled_train_instances, shuffle=True, num_epochs=1, cuda_device=device_num)
-        for batch in tqdm(train_iter, desc=f"epoch: {i_epoch} / {num_epoch}, iteration: ", total=len(train_iter)):
+        for i, batch in tqdm(enumerate(train_iter), desc=f"epoch: {i_epoch} / {num_epoch}, iteration: ", total=len(enumerate(train_iter))):
             model.train()
             out = model(batch)
             y = batch['selection_label']
