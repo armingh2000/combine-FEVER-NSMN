@@ -288,6 +288,7 @@ def hidden_eval(model, data_iter, dev_data_list):
             -2: "hidden"
         }
 
+        print()
         print("Evaluating ...")
         model.eval()
         totoal_size = 0
@@ -599,7 +600,7 @@ def train_fever_v1():
                     )
 
                     torch.save(model.state_dict(), save_path)
-        # 
+        #
         print("Epoch Evaluation...")
         eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
         complete_upstream_dev_data = hidden_eval(model, eval_iter, complete_upstream_dev_data)
