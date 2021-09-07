@@ -51,7 +51,7 @@ train file path = {train_upstream_file}""")
     cursor = fever_db.get_cursor()
     complete_upstream_dev_data = disamb.sample_disamb_inference(dev_data_list, cursor,
                                                                 contain_first_sentence=contain_first_sentence)
-    logger.info("Dev size:", len(complete_upstream_dev_data))
+    logger.info(f"Dev size: {len(complete_upstream_dev_data)}")
     dev_instances = dev_fever_data_reader.read(complete_upstream_dev_data)
 
     # Load Vocabulary
@@ -111,13 +111,13 @@ train file path = {train_upstream_file}""")
                                                                         cursor, pn_ratio, contain_first_sentence,
                                                                         only_found=False)
         random.shuffle(complete_upstream_train_data)
-        logger.info("Sample Prob.:", pn_ratio)
+        logger.info(f"Sample Prob.:  {pn_ratio}")
 
-        logger.info("Sampled_length:", len(complete_upstream_train_data))
+        logger.info(f"Sampled_length: {len(complete_upstream_train_data)}")
         sampled_train_instances = train_fever_data_reader.read(complete_upstream_train_data)
 
         train_iter = biterator(sampled_train_instances, shuffle=True, num_epochs=1, cuda_device=device_num)
-        for i, batch in tqdm(enumerate(train_iter), desc=f"epoch: {i_epoch + 1} / {num_epoch}, iteration: "):
+        for i, batch in tqdm.tqdm(enumerate(train_iter), desc=f"epoch: {i_epoch + 1} / {num_epoch}, iteration: "):
             model.train()
             out = model(batch)
             y = batch['selection_label']
@@ -146,8 +146,8 @@ train file path = {train_upstream_file}""")
                 oracle_score, pr, rec, f1 = c_scorer.fever_doc_only(dev_data_list, dev_data_list, max_evidence=5)
 
                 logger.info(f"Dev(raw_acc/pr/rec/f1):{oracle_score}/{pr}/{rec}/{f1}")
-                logger.info("Strict score:", oracle_score)
-                logger.info(f"Eval Tracking score:", f"{oracle_score}")
+                logger.info(f"Strict score: {oracle_score}")
+                logger.info(f"Eval Tracking score: {oracle_score}")
 
                 need_save = False
                 if oracle_score > best_dev:
@@ -173,8 +173,8 @@ train file path = {train_upstream_file}""")
         oracle_score, pr, rec, f1 = c_scorer.fever_doc_only(dev_data_list, dev_data_list, max_evidence=5)
 
         logger.info(f"Dev(raw_acc/pr/rec/f1):{oracle_score}/{pr}/{rec}/{f1}")
-        logger.info("Strict score:", oracle_score)
-        logger.info(f"Eval Tracking score:", f"{oracle_score}")
+        logger.info(f"Strict score: {oracle_score}")
+        logger.info(f"Eval Tracking score: {oracle_score}")
 
         need_save = False
         if oracle_score > best_dev:
