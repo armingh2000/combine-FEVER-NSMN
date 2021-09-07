@@ -539,12 +539,12 @@ if __name__ == '__main__':
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
     stream_handler.setLevel(logging.INFO)
-    tqdm_handler = logging.StreamHandler(tqdm.tqdm)
+    #tqdm_handler = logging.StreamHandler(tqdm.tqdm)
 
     logger = logging.getLogger(__name__)
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
-    logger.addHandler(tqdm_handler)
+    #logger.addHandler(tqdm_handler)
     logger.setLevel(logging.INFO)
 
     main(models)
