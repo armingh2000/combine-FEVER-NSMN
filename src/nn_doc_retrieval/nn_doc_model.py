@@ -288,8 +288,7 @@ def hidden_eval(model, data_iter, dev_data_list):
             -2: "hidden"
         }
 
-        print()
-        print("Evaluating ...")
+
         model.eval()
         totoal_size = 0
 

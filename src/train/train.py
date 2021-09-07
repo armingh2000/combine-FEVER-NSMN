@@ -1,10 +1,15 @@
-#from tqdm.auto import trange
 from nn_doc_retrieval.nn_doc_model import *
 #from sentence_retrieval.simple_nnmodel import *
 # from nli.mesim_wn_simi_v1_2 import *
 
+import logging
+import tqdm
+import os
+from time import strftime
 
 def train_nn_doc(model_name):
+    logger.info(f"training doc model with name {model_name}")
+
     num_epoch = 10
     seed = 12
     batch_size = 64
@@ -16,8 +21,20 @@ def train_nn_doc(model_name):
     # keep_neg_sample_prob = 0.4
     # sample_prob_decay = 0.05
 
+    logger.info(f"""training parameters:
+epoch number = {num_epoch}
+seed = {seed}
+batch_size = {batch_size}
+dev_batch_size = {dev_batch_size}
+lazy = {lazy}
+contain_first_sentence = {contain_first_sentence}
+pn_ration = {pn_ratio}""")
+
     dev_upstream_file = config.RESULT_PATH / "pipeline_r_aaai_doc/2021_08_22_13:03:04_r/doc_retr_1_shared_task_dev.jsonl"
     train_upstream_file = config.RESULT_PATH / "pipeline_r_aaai_doc/2021_09_02_16:31:02_r/doc_retr_1_train.jsonl"
+
+    logger.info(f"dev file path = {dev_upstream_file) \ntrain file path = {train_upstream_file}}")
+
     dev_data_list = common.load_jsonl(dev_upstream_file)
     train_data_list = common.load_jsonl(train_upstream_file)
 
@@ -33,7 +50,7 @@ def train_nn_doc(model_name):
     cursor = fever_db.get_cursor()
     complete_upstream_dev_data = disamb.sample_disamb_inference(dev_data_list, cursor,
                                                                 contain_first_sentence=contain_first_sentence)
-    print("Dev size:", len(complete_upstream_dev_data))
+    logger.info("Dev size:", len(complete_upstream_dev_data))
     dev_instances = dev_fever_data_reader.read(complete_upstream_dev_data)
 
     # Load Vocabulary
@@ -50,8 +67,8 @@ def train_nn_doc(model_name):
 
     vocab.get_index_to_token_vocabulary('selection_labels')
 
-    print(vocab.get_token_to_index_vocabulary('selection_labels'))
-    print(vocab.get_vocab_size('tokens'))
+    logger.info(vocab.get_token_to_index_vocabulary('selection_labels'))
+    logger.info(vocab.get_vocab_size('tokens'))
 
     biterator.index_with(vocab)
     dev_biterator.index_with(vocab)
@@ -83,16 +100,19 @@ def train_nn_doc(model_name):
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=start_lr)
     criterion = nn.CrossEntropyLoss()
 
+    logger.info("start training")
+
     for i_epoch in range(num_epoch):
-        print("Resampling...")
+        logger.info(f"begin epoch {i_epoch}")
+        logger.info("Resampling...")
         # Resampling
         complete_upstream_train_data = disamb.sample_disamb_training_v0(train_data_list,
                                                                         cursor, pn_ratio, contain_first_sentence,
                                                                         only_found=False)
         random.shuffle(complete_upstream_train_data)
-        print("Sample Prob.:", pn_ratio)
+        logger.info("Sample Prob.:", pn_ratio)
 
-        print("Sampled_length:", len(complete_upstream_train_data))
+        logger.info("Sampled_length:", len(complete_upstream_train_data))
         sampled_train_instances = train_fever_data_reader.read(complete_upstream_train_data)
 
         train_iter = biterator(sampled_train_instances, shuffle=True, num_epochs=1, cuda_device=device_num)
@@ -115,6 +135,7 @@ def train_nn_doc(model_name):
                 mod = 500
 
             if iteration % mod == 0:
+                logger.info("Evaluating ...")
 
                 eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
                 complete_upstream_dev_data = hidden_eval(model, eval_iter, complete_upstream_dev_data)
@@ -123,9 +144,9 @@ def train_nn_doc(model_name):
                                                                       dev_data_list)
                 oracle_score, pr, rec, f1 = c_scorer.fever_doc_only(dev_data_list, dev_data_list, max_evidence=5)
 
-                print(f"Dev(raw_acc/pr/rec/f1):{oracle_score}/{pr}/{rec}/{f1}")
-                print("Strict score:", oracle_score)
-                print(f"Eval Tracking score:", f"{oracle_score}")
+                logger.info(f"Dev(raw_acc/pr/rec/f1):{oracle_score}/{pr}/{rec}/{f1}")
+                logger.info("Strict score:", oracle_score)
+                logger.info(f"Eval Tracking score:", f"{oracle_score}")
 
                 need_save = False
                 if oracle_score > best_dev:
@@ -142,7 +163,7 @@ def train_nn_doc(model_name):
                     torch.save(model.state_dict(), save_path)
 
         #
-        print("Epoch Evaluation...")
+        logger.info("Epoch Evaluation...")
         eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
         complete_upstream_dev_data = hidden_eval(model, eval_iter, complete_upstream_dev_data)
 
@@ -150,9 +171,9 @@ def train_nn_doc(model_name):
                                                               dev_data_list)
         oracle_score, pr, rec, f1 = c_scorer.fever_doc_only(dev_data_list, dev_data_list, max_evidence=5)
 
-        print(f"Dev(raw_acc/pr/rec/f1):{oracle_score}/{pr}/{rec}/{f1}")
-        print("Strict score:", oracle_score)
-        print(f"Eval Tracking score:", f"{oracle_score}")
+        logger.info(f"Dev(raw_acc/pr/rec/f1):{oracle_score}/{pr}/{rec}/{f1}")
+        logger.info("Strict score:", oracle_score)
+        logger.info(f"Eval Tracking score:", f"{oracle_score}")
 
         need_save = False
         if oracle_score > best_dev:
@@ -191,7 +212,7 @@ def train_nn_sent(model_name):
     dev_fever_data_reader = SSelectorReader(token_indexers=token_indexers, lazy=lazy, max_l=180)
 
     complete_upstream_dev_data = get_full_list(config.T_FEVER_DEV_JSONL, dev_upstream_file, pred=True)
-    print("Dev size:", len(complete_upstream_dev_data))
+    logger.info("Dev size:", len(complete_upstream_dev_data))
     dev_instances = dev_fever_data_reader.read(complete_upstream_dev_data)
 
     # Load Vocabulary
@@ -208,8 +229,8 @@ def train_nn_sent(model_name):
 
     vocab.get_index_to_token_vocabulary('selection_labels')
 
-    print(vocab.get_token_to_index_vocabulary('selection_labels'))
-    print(vocab.get_vocab_size('tokens'))
+    logger.info(vocab.get_token_to_index_vocabulary('selection_labels'))
+    logger.info(vocab.get_vocab_size('tokens'))
 
     biterator.index_with(vocab)
     dev_biterator.index_with(vocab)
@@ -242,17 +263,17 @@ def train_nn_sent(model_name):
     criterion = nn.CrossEntropyLoss()
 
     for i_epoch in trange(num_epoch, desc="epoch"):
-        print("Resampling...")
+        logger.info("Resampling...")
         # Resampling
         complete_upstream_train_data = get_full_list(config.T_FEVER_TRAIN_JSONL, train_upstream_file, pred=False)
-        print("Sample Prob.:", keep_neg_sample_prob)
+        logger.info("Sample Prob.:", keep_neg_sample_prob)
         filtered_train_data = post_filter(complete_upstream_train_data, keep_prob=keep_neg_sample_prob,
                                           seed=12 + i_epoch)
         # Change the seed to avoid duplicate sample...
         keep_neg_sample_prob -= sample_prob_decay
         if keep_neg_sample_prob <= 0:
             keep_neg_sample_prob = 0.005
-        print("Sampled_length:", len(filtered_train_data))
+        logger.info("Sampled_length:", len(filtered_train_data))
         sampled_train_instances = train_fever_data_reader.read(filtered_train_data)
 
         train_iter = biterator(sampled_train_instances, shuffle=True, num_epochs=1, cuda_device=device_num)
@@ -286,9 +307,9 @@ def train_nn_sent(model_name):
                 hit = eval_mode['check_sent_id_correct_hits']
                 tracking_score = hit / total
 
-                print(f"Dev(raw_acc/pr/rec/f1):{acc_score}/{pr}/{rec}/{f1}/")
-                print("Strict score:", strict_score)
-                print(f"Eval Tracking score:", f"{tracking_score}")
+                logger.info(f"Dev(raw_acc/pr/rec/f1):{acc_score}/{pr}/{rec}/{f1}/")
+                logger.info("Strict score:", strict_score)
+                logger.info(f"Eval Tracking score:", f"{tracking_score}")
 
                 need_save = False
                 if tracking_score > best_dev:
@@ -305,7 +326,7 @@ def train_nn_sent(model_name):
                     torch.save(model.state_dict(), save_path)
 
 
-        print("Epoch Evaluation...")
+        logger.info("Epoch Evaluation...")
         eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
         complete_upstream_dev_data = hidden_eval(model, eval_iter, complete_upstream_dev_data)
 
@@ -317,9 +338,9 @@ def train_nn_sent(model_name):
         hit = eval_mode['check_sent_id_correct_hits']
         tracking_score = hit / total
 
-        print(f"Dev(raw_acc/pr/rec/f1):{acc_score}/{pr}/{rec}/{f1}/")
-        print("Strict score:", strict_score)
-        print(f"Eval Tracking score:", f"{tracking_score}")
+        logger.info(f"Dev(raw_acc/pr/rec/f1):{acc_score}/{pr}/{rec}/{f1}/")
+        logger.info("Strict score:", strict_score)
+        logger.info(f"Eval Tracking score:", f"{tracking_score}")
 
         if tracking_score > best_dev:
             best_dev = tracking_score
@@ -342,9 +363,9 @@ def train_nn_nli(model_name):
     train_prob_threshold = 0.35
     train_sample_top_k = 12
 
-    print("Dev prob threshold:", dev_prob_threshold)
-    print("Train prob threshold:", train_prob_threshold)
-    print("Train sample top k:", train_sample_top_k)
+    logger.info("Dev prob threshold:", dev_prob_threshold)
+    logger.info("Train prob threshold:", train_prob_threshold)
+    logger.info("Train sample top k:", train_sample_top_k)
 
     dev_upstream_sent_list = common.load_jsonl(config.RESULT_PATH /
                                                "sent_retri_nn/2018_07_20_15:17:59_r/dev_sent.jsonl")
@@ -360,7 +381,7 @@ def train_nn_nli(model_name):
 
     p_dict = wn_persistent_api.persistence_load()
 
-    print("Building Prob Dicts...")
+    logger.info("Building Prob Dicts...")
     train_sent_list = common.load_jsonl(
         config.RESULT_PATH / "sent_retri_nn/2018_07_20_15:17:59_r/train_sent.jsonl")
     remaining_sent_list = common.load_jsonl(
@@ -387,8 +408,8 @@ def train_nn_nli(model_name):
     vocab, weight_dict = load_vocab_embeddings(config.DATA_ROOT / "vocab_cache" / "nli_basic")
     vocab.change_token_with_index_to_namespace('hidden', -2, namespace='labels')
 
-    print(vocab.get_token_to_index_vocabulary('labels'))
-    print(vocab.get_vocab_size('tokens'))
+    logger.info(vocab.get_token_to_index_vocabulary('labels'))
+    logger.info(vocab.get_vocab_size('tokens'))
 
     biterator.index_with(vocab)
 
@@ -404,7 +425,7 @@ def train_nn_nli(model_name):
                   mlp_d=900,
                   embedding_dim=300, max_l=300)
 
-    print("Model Max length:", model.max_l)
+    logger.info("Model Max length:", model.max_l)
     model.display()
     model.to(device)
 
@@ -426,7 +447,7 @@ def train_nn_nli(model_name):
 
 
     for i_epoch in range(num_epoch):
-        print("Resampling...")
+        logger.info("Resampling...")
         # Resampling
         train_data_with_candidate_sample_list = \
             threshold_sampler(config.T_FEVER_TRAIN_JSONL, train_upstream_sent_list, train_prob_threshold,
@@ -437,7 +458,7 @@ def train_nn_nli(model_name):
                                                                       selection_dict,
                                                                       tokenized=True)
 
-        print("Sample data length:", len(complete_upstream_train_data))
+        logger.info("Sample data length:", len(complete_upstream_train_data))
         sampled_train_instances = train_fever_data_reader.read(complete_upstream_train_data)
 
         train_iter = biterator(sampled_train_instances, shuffle=True, num_epochs=1, cuda_device=device_num)
@@ -464,7 +485,7 @@ def train_nn_nli(model_name):
                 eval_iter = biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
                 dev_score, dev_loss = full_eval_model(model, eval_iter, criterion, complete_upstream_dev_data)
 
-                print(f"Dev:{dev_score}/{dev_loss}")
+                logger.info(f"Dev:{dev_score}/{dev_loss}")
 
                 need_save = False
                 if dev_score > best_dev:
@@ -484,9 +505,60 @@ def train_nn_nli(model_name):
         wn_persistent_api.persistence_update(p_dict)
 
 
+def main(models_list):
+    for model_name in models_list:
+        if 'doc' in model_name:
+            train_nn_train(model_name)
+
+        elif 'ss' in model_name:
+            train_nn_sent(model_name)
+
+        else:
+            train_nn_nli(model_name)
+
+
+class TqdmLoggingHandler(logging.Handler):
+    def __init__(self, level=logging.NOTSET):
+        super().__init__(level)
+
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            tqdm.tqdm.write(msg)
+            self.flush()
+        except Exception:
+            self.handleError(record)
+
 
 if __name__ == '__main__':
-    train_nn_doc('nn_doc')
+    models = ['nn_doc'] # can have nn_doc, nn_ss, nn_nli
+
+    log_dir = config.PRO_ROOT / "logs"
+    date_dir = strftime('%d-%m-%Y')
+    time_dir = strftime('%X')
+    log_path = os.path.join(log_dir, date_dir, time_dir)
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+    log_file = os.path.join(log_path, f"train.log")
+
+    formatter = logging.Formatter(
+        fmt='%(levelname)s::%(asctime)s::%(message)s',
+        datefmt='%m/%d/%Y %I:%M:%S %p',
+    )
+
+    file_handler = logging.FileHandler(log_file)
+    stream_handler = logging.StreamHandler()
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(logging.INFO)
+    stream_handler.setLevel(logging.INFO)
+
+    logger = logging.getLogger(__name__)
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)
+    logger.addHandler(TqdmLoggingHandler())
+    logger.setLevel(logging.INFO)
+
+    main(models)
 
     #train_nn_doc(9000, 1, 'nn_doc')
     #train_nn_sent(57167, 6, 'nn_ss')
