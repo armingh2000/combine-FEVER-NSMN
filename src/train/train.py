@@ -540,7 +540,7 @@ if __name__ == '__main__':
     )
 
     file_handler = logging.FileHandler(log_file)
-    stream_handler = logging.StreamHandler()
+    stream_handler = logging.StreamHandler(sys.stdout)
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
     stream_handler.setLevel(logging.INFO)
