@@ -518,19 +518,6 @@ def main(models_list):
             train_nn_nli(model_name)
 
 
-class TqdmLoggingHandler(logging.Handler):
-    def __init__(self, level=logging.NOTSET):
-        super().__init__(level)
-
-    def emit(self, record):
-        try:
-            msg = self.format(record)
-            tqdm.tqdm.write(msg)
-            self.flush()
-        except Exception:
-            self.handleError(record)
-
-
 if __name__ == '__main__':
     models = ['nn_doc'] # can have nn_doc, nn_ss, nn_nli
 
@@ -552,11 +539,13 @@ if __name__ == '__main__':
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
     stream_handler.setLevel(logging.INFO)
+    tqdm_handler = logging.StreamHandler()
+    tqdm_handler.setStream(tqdm.tqdm)
 
     logger = logging.getLogger(__name__)
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
-    logger.addHandler(TqdmLoggingHandler())
+    logger.addHandler(tqdm_handler)
     logger.setLevel(logging.INFO)
 
     main(models)
