@@ -6,6 +6,7 @@ import logging
 import tqdm
 import os
 from time import strftime
+from datetime import datetime
 
 def train_nn_doc(model_name):
     logger.info(f"training doc model with name {model_name}")
@@ -104,6 +105,7 @@ train file path = {train_upstream_file}""")
     logger.info("start training")
 
     for i_epoch in range(num_epoch):
+        start = datetime.now()
         logger.info(f"begin epoch {i_epoch}")
         logger.info("Resampling...")
         # Resampling
@@ -130,7 +132,7 @@ train file path = {train_upstream_file}""")
             optimizer.step()
             iteration += 1
 
-            if i_epoch <= 5:
+            if i_epoch > 5:
                 mod = 1000
             else:
                 mod = 500
@@ -164,6 +166,8 @@ train file path = {train_upstream_file}""")
                     torch.save(model.state_dict(), save_path)
 
         #
+        end = datetime.now()
+        logger.info(f"finish epoch {i_epoch} in {end - start} time")
         logger.info("Epoch Evaluation...")
         eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
         complete_upstream_dev_data = hidden_eval(model, eval_iter, complete_upstream_dev_data)
@@ -448,6 +452,7 @@ def train_nn_nli(model_name):
 
 
     for i_epoch in range(num_epoch):
+
         logger.info("Resampling...")
         # Resampling
         train_data_with_candidate_sample_list = \
@@ -539,12 +544,10 @@ if __name__ == '__main__':
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
     stream_handler.setLevel(logging.INFO)
-    #tqdm_handler = logging.StreamHandler(tqdm.tqdm)
 
     logger = logging.getLogger(__name__)
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
-    #logger.addHandler(tqdm_handler)
     logger.setLevel(logging.INFO)
 
     main(models)
