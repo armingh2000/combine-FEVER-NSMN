@@ -509,7 +509,7 @@ def train_nn_nli(model_name):
 def main(models_list):
     for model_name in models_list:
         if 'doc' in model_name:
-            train_nn_train(model_name)
+            train_nn_doc(model_name)
 
         elif 'ss' in model_name:
             train_nn_sent(model_name)
