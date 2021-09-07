@@ -7,6 +7,7 @@ import tqdm
 import os
 from time import strftime
 from datetime import datetime
+import sys
 
 def train_nn_doc(model_name):
     logger.info(f"training doc model with name {model_name}")
