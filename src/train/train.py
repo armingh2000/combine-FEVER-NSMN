@@ -33,7 +33,8 @@ pn_ration = {pn_ratio}""")
     dev_upstream_file = config.RESULT_PATH / "pipeline_r_aaai_doc/2021_08_22_13:03:04_r/doc_retr_1_shared_task_dev.jsonl"
     train_upstream_file = config.RESULT_PATH / "pipeline_r_aaai_doc/2021_09_02_16:31:02_r/doc_retr_1_train.jsonl"
 
-    logger.info(f"dev file path = {dev_upstream_file) \ntrain file path = {train_upstream_file}}")
+    logger.info(f"""dev file path = {dev_upstream_file)
+train file path = {train_upstream_file}}""")
 
     dev_data_list = common.load_jsonl(dev_upstream_file)
     train_data_list = common.load_jsonl(train_upstream_file)
