@@ -111,7 +111,7 @@ train file path = {train_upstream_file}""")
         logger.info(f"begin epoch {i_epoch}")
         logger.info("Resampling...")
         # Resampling
-        complete_upstream_train_data = disamb.sample_disamb_training_v0(train_data_list,
+        complete_upstream_train_data = disamb.sample_disamb_training_v0(train_data_list[:50],
                                                                         cursor, pn_ratio, contain_first_sentence,
                                                                         only_found=False)
         random.shuffle(complete_upstream_train_data)
