@@ -104,6 +104,7 @@ train file path = {train_upstream_file}""")
     criterion = nn.CrossEntropyLoss()
 
     logger.info("start training")
+    saved_models = []
 
     for i_epoch in range(num_epoch):
         start = datetime.now()
@@ -158,13 +159,16 @@ train file path = {train_upstream_file}""")
                     need_save = True
 
                 if need_save:
+                    model_file = f'i({iteration})_epoch({i_epoch})_' \
+                        f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
                     save_path = os.path.join(
                         file_path_prefix,
-                        f'i({iteration})_epoch({i_epoch})_'
-                        f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
+                        model_file
                     )
 
                     torch.save(model.state_dict(), save_path)
+
+                    logger.info(f"saved model in the middle of epoch {i_epoch}: {model_file}")
 
         #
         end = datetime.now()
@@ -187,13 +191,16 @@ train file path = {train_upstream_file}""")
             need_save = True
 
         if need_save:
+            model_file = f'i({iteration})_epoch({i_epoch})_' \
+                        f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
             save_path = os.path.join(
                 file_path_prefix,
-                f'i({iteration})_epoch({i_epoch})_e'
-                f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
+                model_file
             )
 
             torch.save(model.state_dict(), save_path)
+
+            logger.info(f"saved model at the end of epoch {i_epoch}: {model_file}")
 
 
 def train_nn_sent(model_name):
