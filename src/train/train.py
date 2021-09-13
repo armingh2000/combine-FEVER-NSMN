@@ -40,6 +40,8 @@ train file path = {train_upstream_file}""")
 
     dev_data_list = common.load_jsonl(dev_upstream_file)
     train_data_list = common.load_jsonl(train_upstream_file)
+    print(len(dev_data_list), len(train_data_list))
+    input()
 
     # Prepare Data
     token_indexers = {
@@ -111,7 +113,7 @@ train file path = {train_upstream_file}""")
         logger.info(f"begin epoch {i_epoch}")
         logger.info("Resampling...")
         # Resampling
-        complete_upstream_train_data = disamb.sample_disamb_training_v0(train_data_list[:50],
+        complete_upstream_train_data = disamb.sample_disamb_training_v0(train_data_list,
                                                                         cursor, pn_ratio, contain_first_sentence,
                                                                         only_found=False)
         random.shuffle(complete_upstream_train_data)
@@ -159,6 +161,9 @@ train file path = {train_upstream_file}""")
                     need_save = True
 
                 if need_save:
+                    if len(saved_models) == 3:
+                        os.remove(os.path.join(file_path_prefix, saved_models.pop(0)))
+
                     model_file = f'i({iteration})_epoch({i_epoch})_' \
                         f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
                     save_path = os.path.join(
@@ -167,6 +172,7 @@ train file path = {train_upstream_file}""")
                     )
 
                     torch.save(model.state_dict(), save_path)
+                    saved_models.append(model_file)
 
                     logger.info(f"saved model in the middle of epoch {i_epoch}: {model_file}")
 
@@ -186,11 +192,14 @@ train file path = {train_upstream_file}""")
         logger.info(f"Eval Tracking score: {oracle_score}")
 
         need_save = False
-        if oracle_score > best_dev:
+        if oracle_score > best_dev or i_epoch == num_epoch:
             best_dev = oracle_score
             need_save = True
 
         if need_save:
+            if len(saved_models) == 3:
+                        os.remove(os.path.join(file_path_prefix, saved_models.pop(0)))
+
             model_file = f'i({iteration})_epoch({i_epoch})_' \
                         f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
             save_path = os.path.join(
@@ -199,6 +208,7 @@ train file path = {train_upstream_file}""")
             )
 
             torch.save(model.state_dict(), save_path)
+            saved_models.append(model_file)
 
             logger.info(f"saved model at the end of epoch {i_epoch}: {model_file}")
 
@@ -556,7 +566,7 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
-    logger.setLevel(logging.INFO)
+    # logger.setLevel(logging.INFO)
 
     main(models)
 
