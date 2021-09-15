@@ -121,7 +121,7 @@ train file path = {train_upstream_file}""")
         sampled_train_instances = train_fever_data_reader.read(complete_upstream_train_data)
 
         train_iter = biterator(sampled_train_instances, shuffle=True, num_epochs=1, cuda_device=device_num)
-        for i, batch in tqdm.tqdm(enumerate(train_iter), desc=f"epoch: {i_epoch + 1} / {num_epoch}, iteration: "):
+        for i, batch in tqdm.tqdm(enumerate(train_iter), desc=f"epoch: {i_epoch} / {num_epoch - 1}, iteration: "):
             model.train()
             out = model(batch)
             y = batch['selection_label']
