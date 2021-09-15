@@ -160,7 +160,8 @@ train file path = {train_upstream_file}""")
 
                 if need_save:
                     if len(saved_models) == 3:
-                        os.remove(os.path.join(file_path_prefix, saved_models.pop(0)))
+                        os.remove(os.path.join(file_path_prefix, saved_models[0]))
+                        logger.info(f"remove model {saved_models.pop(0)} to keep 3 limits")
 
                     model_file = f'i({iteration})_epoch({i_epoch})_' \
                         f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
@@ -196,7 +197,8 @@ train file path = {train_upstream_file}""")
 
         if need_save:
             if len(saved_models) == 3:
-                        os.remove(os.path.join(file_path_prefix, saved_models.pop(0)))
+                os.remove(os.path.join(file_path_prefix, saved_models[0]))
+                logger.info(f"remove model {saved_models.pop(0)} to keep 3 limits")
 
             model_file = f'i({iteration})_epoch({i_epoch})_' \
                         f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
