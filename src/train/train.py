@@ -556,7 +556,7 @@ if __name__ == '__main__':
     )
 
     stream_formatter = logging.Formatter(
-        fmt='%(message)'
+        fmt='%(message)s'
     )
 
     file_handler = logging.FileHandler(log_file)
