@@ -167,6 +167,8 @@ train file path = {train_upstream_file}""")
                         f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
                     save_path = os.path.join(
                         file_path_prefix,
+                        date_dir,
+                        time_dir,
                         model_file
                     )
 
@@ -204,6 +206,8 @@ train file path = {train_upstream_file}""")
                         f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
             save_path = os.path.join(
                 file_path_prefix,
+                date_dir,
+                time_dir,
                 model_file
             )
 
