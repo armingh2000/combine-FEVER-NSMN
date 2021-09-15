@@ -89,6 +89,9 @@ train file path = {train_upstream_file}""")
 
     # Create Log File
     file_path_prefix, date = save_tool.gen_file_prefix(f"{model_name}")
+    file_path_prefix = os.path.join(file_path_prefix, date_dir, time_dir)
+    if not os.path.exists(file_path_prefix):
+        os.makedirs(file_path_prefix)
     # Save the source code.
     script_name = os.path.basename(__file__)
     with open(os.path.join(file_path_prefix, script_name), 'w') as out_f, open(__file__, 'r') as it:
@@ -167,8 +170,6 @@ train file path = {train_upstream_file}""")
                         f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
                     save_path = os.path.join(
                         file_path_prefix,
-                        date_dir,
-                        time_dir,
                         model_file
                     )
 
@@ -206,8 +207,6 @@ train file path = {train_upstream_file}""")
                         f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
             save_path = os.path.join(
                 file_path_prefix,
-                date_dir,
-                time_dir,
                 model_file
             )
 
