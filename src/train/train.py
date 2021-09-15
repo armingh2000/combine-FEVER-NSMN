@@ -159,9 +159,9 @@ train file path = {train_upstream_file}""")
                     need_save = True
 
                 if need_save:
-                    if len(saved_models) == 3:
+                    if len(saved_models) == n_models:
                         os.remove(os.path.join(file_path_prefix, saved_models[0]))
-                        logger.info(f"remove model {saved_models.pop(0)} to keep 3 limits")
+                        logger.info(f"remove model {saved_models.pop(0)} to keep {n_models} limits")
 
                     model_file = f'i({iteration})_epoch({i_epoch})_' \
                         f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
@@ -191,14 +191,14 @@ train file path = {train_upstream_file}""")
         logger.info(f"Eval Tracking score: {oracle_score}")
 
         need_save = False
-        if oracle_score > best_dev or i_epoch == num_epoch:
+        if oracle_score > best_dev or i_epoch == num_epoch - 1:
             best_dev = oracle_score
             need_save = True
 
         if need_save:
-            if len(saved_models) == 3:
+            if len(saved_models) == n_models:
                 os.remove(os.path.join(file_path_prefix, saved_models[0]))
-                logger.info(f"remove model {saved_models.pop(0)} to keep 3 limits")
+                logger.info(f"remove model {saved_models.pop(0)} to keep {n_models} limits")
 
             model_file = f'i({iteration})_epoch({i_epoch})_' \
                         f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
@@ -543,6 +543,7 @@ def main(models_list):
 
 if __name__ == '__main__':
     models = ['nn_doc'] # can have nn_doc, nn_ss, nn_nli
+    n_models = 3
 
     log_dir = config.PRO_ROOT / "logs"
     date_dir = strftime('%d-%m-%Y')
