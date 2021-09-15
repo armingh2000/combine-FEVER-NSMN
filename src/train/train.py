@@ -550,15 +550,21 @@ if __name__ == '__main__':
         os.makedirs(log_path)
     log_file = os.path.join(log_path, f"train.log")
 
-    formatter = logging.Formatter(
+    file_formatter = logging.Formatter(
         fmt='%(levelname)s::%(asctime)s::%(message)s',
         datefmt='%m/%d/%Y %I:%M:%S %p',
     )
 
+    stream_formatter = logging.Formatter(
+        fmt='%(message)'
+    )
+
     file_handler = logging.FileHandler(log_file)
-    stream_handler = logging.StreamHandler(sys.stdout)
-    file_handler.setFormatter(formatter)
+    file_handler.setFormatter(file_formatter)
     file_handler.setLevel(logging.INFO)
+
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setFormatter(stream_formatter)
     stream_handler.setLevel(logging.INFO)
 
     logger = logging.getLogger(__name__)
