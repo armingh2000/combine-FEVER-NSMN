@@ -38,8 +38,8 @@ pn_ration = {pn_ratio}""")
     logger.info(f"""dev file path = {dev_upstream_file}
 train file path = {train_upstream_file}""")
 
-    dev_data_list = common.load_jsonl(dev_upstream_file)[:10000]
-    train_data_list = common.load_jsonl(train_upstream_file)[:20000]
+    dev_data_list = common.load_jsonl(dev_upstream_file)[:1000]
+    train_data_list = common.load_jsonl(train_upstream_file)[:2000]
 
     # Prepare Data
     token_indexers = {
@@ -564,7 +564,10 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
-    # logger.setLevel(logging.INFO)
+    logger.setLevel(logging.INFO)
+
+    print(logger.handlers)
+    input()
 
     main(models)
 
