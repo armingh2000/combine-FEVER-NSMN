@@ -1,4 +1,5 @@
 from nli.mesim_wn_simi_v1_2 import *
+from datetime import datetime
 
 
 def train_nn_nli(model_name, logger, date_dir, time_dir):

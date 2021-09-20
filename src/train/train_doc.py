@@ -1,4 +1,5 @@
 from nn_doc_retrieval.nn_doc_model import *
+from datetime import datetime
 
 
 def train_nn_doc(model_name, logger, date_dir, time_dir):

@@ -1,4 +1,5 @@
 from sentence_retrieval.simple_nnmodel import *
+from datetime import datetime
 
 
 def train_nn_sent(model_name, logger, date_dir, time_dir):
