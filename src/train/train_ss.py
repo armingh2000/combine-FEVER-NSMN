@@ -41,7 +41,7 @@ train file path = {train_upstream_file}""")
     train_fever_data_reader = SSelectorReader(token_indexers=token_indexers, lazy=lazy, max_l=180)
     dev_fever_data_reader = SSelectorReader(token_indexers=token_indexers, lazy=lazy, max_l=180)
 
-    complete_upstream_dev_data = get_full_list(config.T_FEVER_DEV_JSONL, dev_data_list, pred=True)
+    complete_upstream_dev_data = get_full_list(config.T_FEVER_DEV_JSONL, dev_data_list, pred=True)[:1000]
     logger.info("Dev size:", len(complete_upstream_dev_data))
     dev_instances = dev_fever_data_reader.read(complete_upstream_dev_data)
 
@@ -103,7 +103,7 @@ train file path = {train_upstream_file}""")
         logger.info(f"begin epoch {i_epoch}")
         logger.info("Resampling...")
         # Resampling
-        complete_upstream_train_data = get_full_list(config.T_FEVER_TRAIN_JSONL, train_data_list, pred=False)[:20000]
+        complete_upstream_train_data = get_full_list(config.T_FEVER_TRAIN_JSONL, train_data_list, pred=False)[:2000]
         logger.info(f"Sample Prob.: {keep_neg_sample_prob}")
         filtered_train_data = post_filter(complete_upstream_train_data, keep_prob=keep_neg_sample_prob,
                                           seed=12 + i_epoch)
