@@ -21,7 +21,7 @@ def main(models_list):
 
 
 if __name__ == '__main__':
-    models = ['nn_doc'] # can have nn_doc, nn_ss, nn_nli
+    models = ['nn_ss'] # can have nn_doc, nn_ss, nn_nli
     n_models = 3
 
     log_dir = config.PRO_ROOT / "logs"
