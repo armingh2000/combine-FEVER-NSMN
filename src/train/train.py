@@ -13,13 +13,13 @@ import config
 def main(models_list):
     for model_name in models_list:
         if 'doc' in model_name:
-            train_nn_doc(model_name)
+            call_trainer(train_nn_doc, model_name)
 
         elif 'ss' in model_name:
-            train_nn_sent(model_name)
+            call_trainer(train_nn_sent, model_name)
 
         else:
-            train_nn_nli(model_name)
+            call_trainer(train_nn_nli, model_name)
 
 
 if __name__ == '__main__':
@@ -56,6 +56,8 @@ if __name__ == '__main__':
     logger.addHandler(stream_handler)
     logger.setLevel(logging.INFO)
     logger.propagate = False
+
+    call_trainer = lambda x, y : x(y, logger, date_dir, time_dir)
 
     main(models)
 
