@@ -98,7 +98,7 @@ train file path = {train_upstream_file}""")
     logger.info("start training")
     saved_models = []
 
-    for i_epoch in trange(num_epoch, desc="epoch"):
+    for i_epoch in range(num_epoch):
         start = datetime.now()
         logger.info(f"begin epoch {i_epoch}")
         logger.info("Resampling...")
