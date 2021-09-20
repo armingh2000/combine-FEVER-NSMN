@@ -10,7 +10,7 @@ from train_nli import train_nn_nli
 import config
 
 
-def train(models_list):
+def main(models_list):
     for model_name in models_list:
         if 'doc' in model_name:
             train_nn_doc(model_name)
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     logger.setLevel(logging.INFO)
     logger.propagate = False
 
-    train(model)
+    main(models)
 
 
     #train_nn_doc(9000, 1, 'nn_doc')
