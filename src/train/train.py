@@ -7,6 +7,7 @@ import sys
 from train_doc import train_nn_doc
 from train_ss import train_nn_sent
 from train_nli import train_nn_nli
+import config
 
 
 def train(models_list):
