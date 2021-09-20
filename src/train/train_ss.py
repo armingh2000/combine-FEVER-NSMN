@@ -29,8 +29,8 @@ sample_prob_decay = {sample_prob_decay}""")
     logger.info(f"""dev file path = {dev_upstream_file}
 train file path = {train_upstream_file}""")
 
-    dev_data_list = common.load_jsonl(dev_upstream_file)[:1000]
-    train_data_list = common.load_jsonl(train_upstream_file)[:2000]
+    dev_data_list = common.load_jsonl(dev_upstream_file)
+    train_data_list = common.load_jsonl(train_upstream_file)
 
     # Prepare Data
     token_indexers = {
@@ -103,7 +103,7 @@ train file path = {train_upstream_file}""")
         logger.info(f"begin epoch {i_epoch}")
         logger.info("Resampling...")
         # Resampling
-        complete_upstream_train_data = get_full_list(config.T_FEVER_TRAIN_JSONL, train_data_list, pred=False)
+        complete_upstream_train_data = get_full_list(config.T_FEVER_TRAIN_JSONL, train_data_list, pred=False)[:20000]
         logger.info("Sample Prob.:", keep_neg_sample_prob)
         filtered_train_data = post_filter(complete_upstream_train_data, keep_prob=keep_neg_sample_prob,
                                           seed=12 + i_epoch)
