@@ -1,8 +1,6 @@
 import logging
-import tqdm
 import os
 from time import strftime
-from datetime import datetime
 import sys
 from train_doc import train_nn_doc
 from train_ss import train_nn_sent
@@ -57,7 +55,7 @@ if __name__ == '__main__':
     logger.setLevel(logging.INFO)
     logger.propagate = False
 
-    call_trainer = lambda x, y : x(y, logger, date_dir, time_dir)
+    call_trainer = lambda x, y : x(y, logger, date_dir, time_dir, n_models)
 
     main(models)
 

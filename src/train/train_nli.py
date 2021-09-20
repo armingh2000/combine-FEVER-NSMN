@@ -1,8 +1,10 @@
 from nli.mesim_wn_simi_v1_2 import *
 from datetime import datetime
+import tqdm
+import os
 
 
-def train_nn_nli(model_name, logger, date_dir, time_dir):
+def train_nn_nli(model_name, logger, date_dir, time_dir, n_models):
     num_epoch = 12
     seed = 12
     batch_size = 32
