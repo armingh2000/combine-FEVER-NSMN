@@ -111,7 +111,7 @@ train file path = {train_upstream_file}""")
         keep_neg_sample_prob -= sample_prob_decay
         if keep_neg_sample_prob <= 0:
             keep_neg_sample_prob = 0.005
-        logger.info("Sampled_length:", len(filtered_train_data))
+        logger.info(f"Sampled_length: {len(filtered_train_data)}")
         sampled_train_instances = train_fever_data_reader.read(filtered_train_data)
 
         train_iter = biterator(sampled_train_instances, shuffle=True, num_epochs=1, cuda_device=device_num)
@@ -148,8 +148,8 @@ train file path = {train_upstream_file}""")
                 tracking_score = hit / total
 
                 logger.info(f"Dev(raw_acc/pr/rec/f1):{acc_score}/{pr}/{rec}/{f1}/")
-                logger.info("Strict score:", strict_score)
-                logger.info(f"Eval Tracking score:", f"{tracking_score}")
+                logger.info(f"Strict score: {strict_score}")
+                logger.info(f"Eval Tracking score: {tracking_score}")
 
                 need_save = False
                 if tracking_score > best_dev:
@@ -177,7 +177,6 @@ train file path = {train_upstream_file}""")
         end = datetime.now()
         logger.info(f"finish epoch {i_epoch} in {end - start} time")
         logger.info("Epoch Evaluation...")
-        logger.info("Epoch Evaluation...")
         eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
         complete_upstream_dev_data = hidden_eval(model, eval_iter, complete_upstream_dev_data)
 
@@ -190,8 +189,8 @@ train file path = {train_upstream_file}""")
         tracking_score = hit / total
 
         logger.info(f"Dev(raw_acc/pr/rec/f1):{acc_score}/{pr}/{rec}/{f1}/")
-        logger.info("Strict score:", strict_score)
-        logger.info(f"Eval Tracking score:", f"{tracking_score}")
+        logger.info(f"Strict score: {strict_score}")
+        logger.info(f"Eval Tracking score: {tracking_score}")
 
         if tracking_score > best_dev or i_epoch == num_epoch - 1:
             best_dev = tracking_score
