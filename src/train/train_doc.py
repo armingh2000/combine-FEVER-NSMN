@@ -1,7 +1,7 @@
 from nn_doc_retrieval.nn_doc_model import *
 
 
-def train_nn_doc(model_name):
+def train_nn_doc(model_name, logger, date_dir, time_dir):
     logger.info(f"training document model with name {model_name}")
 
     num_epoch = 10

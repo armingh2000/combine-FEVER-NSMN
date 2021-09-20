@@ -1,7 +1,7 @@
 from sentence_retrieval.simple_nnmodel import *
 
 
-def train_nn_sent(model_name):
+def train_nn_sent(model_name, logger, date_dir, time_dir):
     logger.info(f"training sentence model with name {model_name}")
 
     num_epoch = 10
