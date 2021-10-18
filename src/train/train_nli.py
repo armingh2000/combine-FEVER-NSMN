@@ -5,6 +5,8 @@ import os
 
 
 def train_nn_nli(model_name, logger, date_dir, time_dir, n_models):
+    logger.info(f"training document model with name {model_name}")
+
     num_epoch = 12
     seed = 12
     batch_size = 32
@@ -13,9 +15,14 @@ def train_nn_nli(model_name, logger, date_dir, time_dir, n_models):
     train_prob_threshold = 0.35
     train_sample_top_k = 12
 
-    logger.info("Dev prob threshold:", dev_prob_threshold)
-    logger.info("Train prob threshold:", train_prob_threshold)
-    logger.info("Train sample top k:", train_sample_top_k)
+    logger.info(f"""training parameters:
+epoch number = {num_epoch}
+seed = {seed}
+batch_size = {batch_size}
+lazy = {lazy}
+dev_prob_threshold = {dev_prob_threshold}
+train_prob_threshold = {train_prob_threshold}
+train_sample_top_k = {train_sample_top_k}""")
 
     dev_upstream_sent_list = common.load_jsonl(config.RESULT_PATH /
                                                "sent_retri_nn/2018_07_20_15:17:59_r/dev_sent.jsonl")
@@ -28,6 +35,8 @@ def train_nn_nli(model_name, logger, date_dir, time_dir, n_models):
         'tokens': SingleIdTokenIndexer(namespace='tokens'),  # This is the raw tokens
         'elmo_chars': ELMoTokenCharactersIndexer(namespace='elmo_characters')  # This is the elmo_characters
     }
+
+
 
     p_dict = wn_persistent_api.persistence_load()
 
