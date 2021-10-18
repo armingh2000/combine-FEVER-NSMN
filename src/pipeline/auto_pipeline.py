@@ -122,7 +122,7 @@ default_steps = {
     },
 
     's2.2.1doc_nn_retri': {
-        'do': False,
+        'do': True,
         'out_file': 'None'
     },
 
