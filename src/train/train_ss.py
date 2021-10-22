@@ -100,18 +100,18 @@ train file path = {train_upstream_file}""")
 
     for i_epoch in range(num_epoch):
         start = datetime.now()
-        logger.info(f"begin epoch {i_epoch}")
-        logger.info("Resampling...")
+        epoch_log = f"epoch {i_epoch} - "
+
         # Resampling
         complete_upstream_train_data = get_full_list(config.T_FEVER_TRAIN_JSONL, train_data_list, pred=False)[:2000]
-        logger.info(f"Sample Prob.: {keep_neg_sample_prob}")
+        epoch_log += f"Sample Prob.: {keep_neg_sample_prob} - "
         filtered_train_data = post_filter(complete_upstream_train_data, keep_prob=keep_neg_sample_prob,
                                           seed=12 + i_epoch)
         # Change the seed to avoid duplicate sample...
         keep_neg_sample_prob -= sample_prob_decay
         if keep_neg_sample_prob <= 0:
             keep_neg_sample_prob = 0.005
-        logger.info(f"Sampled_length: {len(filtered_train_data)}")
+        epoch_log += f"Sampled_length: {len(filtered_train_data)} - "
         sampled_train_instances = train_fever_data_reader.read(filtered_train_data)
 
         train_iter = biterator(sampled_train_instances, shuffle=True, num_epochs=1, cuda_device=device_num)
@@ -134,7 +134,7 @@ train file path = {train_upstream_file}""")
                 mod = 8000
 
             if iteration % mod == 0:
-                logger.info("Evaluating ...")
+                iter_log = "Evaluating ... - "
 
                 eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
                 complete_upstream_dev_data = hidden_eval(model, eval_iter, complete_upstream_dev_data)
@@ -147,9 +147,9 @@ train file path = {train_upstream_file}""")
                 hit = eval_mode['check_sent_id_correct_hits']
                 tracking_score = hit / total
 
-                logger.info(f"Dev(raw_acc/pr/rec/f1):{acc_score}/{pr}/{rec}/{f1}/")
-                logger.info(f"Strict score: {strict_score}")
-                logger.info(f"Eval Tracking score: {tracking_score}")
+                iter_log += f"Dev(raw_acc/pr/rec/f1):{acc_score}/{pr}/{rec}/{f1}/ - "
+                iter_log += f"Strict score: {strict_score} - "
+                iter_log += f"Eval Tracking score: {tracking_score} -"
 
                 need_save = False
                 if tracking_score > best_dev:
@@ -159,7 +159,7 @@ train file path = {train_upstream_file}""")
                 if need_save:
                     if len(saved_models) == n_models:
                         os.remove(os.path.join(file_path_prefix, saved_models[0]))
-                        logger.info(f"remove model {saved_models.pop(0)} to keep {n_models} limits")
+                        iter_log += f"remove model {saved_models.pop(0)} to keep {n_models} limits - "
 
                     model_file = f'i({iteration})_epoch({i_epoch})_' \
                         f'(tra_score:{tracking_score}|raw_acc:{acc_score}|pr:{pr}|rec:{rec}|f1:{f1})'
@@ -172,11 +172,12 @@ train file path = {train_upstream_file}""")
                     torch.save(model.state_dict(), save_path)
                     saved_models.append(model_file)
 
-                    logger.info(f"saved model in the middle of epoch {i_epoch}: {model_file}")
+                    iter_log += f"saved model in the middle of epoch {i_epoch}: {model_file}"
+
+                logger.info(iter_log)
 
         end = datetime.now()
-        logger.info(f"finish epoch {i_epoch} in {end - start} time")
-        logger.info("Epoch Evaluation...")
+        epoch_log += f"epoch time: {end - start} - "
         eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
         complete_upstream_dev_data = hidden_eval(model, eval_iter, complete_upstream_dev_data)
 
@@ -188,16 +189,16 @@ train file path = {train_upstream_file}""")
         hit = eval_mode['check_sent_id_correct_hits']
         tracking_score = hit / total
 
-        logger.info(f"Dev(raw_acc/pr/rec/f1):{acc_score}/{pr}/{rec}/{f1}/")
-        logger.info(f"Strict score: {strict_score}")
-        logger.info(f"Eval Tracking score: {tracking_score}")
+        epoch_log += f"Dev(raw_acc/pr/rec/f1):{acc_score}/{pr}/{rec}/{f1}/ - "
+        epoch_log += f"Strict score: {strict_score} - "
+        epoch_log += f"Eval Tracking score: {tracking_score} - "
 
         if tracking_score > best_dev or i_epoch == num_epoch - 1:
             best_dev = tracking_score
 
             if len(saved_models) == n_models:
                 os.remove(os.path.join(file_path_prefix, saved_models[0]))
-                logger.info(f"remove model {saved_models.pop(0)} to keep {n_models} limits")
+                epoch_log += f"remove model {saved_models.pop(0)} to keep {n_models} limits - "
 
             model_file = f'i({iteration})_epoch({i_epoch})_' \
                 f'(tra_score:{tracking_score}|raw_acc:{acc_score}|pr:{pr}|rec:{rec}|f1:{f1})'
@@ -210,4 +211,6 @@ train file path = {train_upstream_file}""")
             torch.save(model.state_dict(), save_path)
             saved_models.append(model_file)
 
-            logger.info(f"saved model at the end of epoch {i_epoch}: {model_file}")
+            epoch_log += f"saved model at the end of epoch {i_epoch}: {model_file}"
+
+        logger.info(epoch_log)
