@@ -112,7 +112,7 @@ train file path = {train_upstream_file}""")
                                                                         cursor, pn_ratio, contain_first_sentence,
                                                                         only_found=False)
         random.shuffle(complete_upstream_train_data)
-        epoch_log += f"Sample Prob.:  {pn_ratio} - "
+        epoch_log += f"Sample Prob.:  {pn_ratio:.2f} - "
 
         epoch_log += f"Sampled_length: {len(complete_upstream_train_data)} - "
         sampled_train_instances = train_fever_data_reader.read(complete_upstream_train_data)
@@ -146,9 +146,9 @@ train file path = {train_upstream_file}""")
                                                                       dev_data_list)
                 oracle_score, pr, rec, f1 = c_scorer.fever_doc_only(dev_data_list, dev_data_list, max_evidence=5)
 
-                iter_log += f"Dev(raw_acc/pr/rec/f1):{oracle_score}/{pr}/{rec}/{f1} - "
-                iter_log += f"Strict score: {oracle_score} - "
-                iter_log += f"Eval Tracking score: {oracle_score} - "
+                iter_log += f"Dev(raw_acc/pr/rec/f1):{oracle_score:.2f}/{pr:.2f}/{rec:.2f}/{f1:.2f} - "
+                iter_log += f"Strict score: {oracle_score:.2f} - "
+                iter_log += f"Eval Tracking score: {oracle_score:.2f} - "
 
                 need_save = False
                 if oracle_score > best_dev:
@@ -161,7 +161,7 @@ train file path = {train_upstream_file}""")
                         iter_log += f"remove model {saved_models.pop(0)} to keep {n_models} limits - "
 
                     model_file = f'i({iteration})_epoch({i_epoch})_' \
-                        f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
+                        f'(tra_score:{oracle_score:.2f}|pr:{pr:.2f}|rec:{rec:.2f}|f1:{f1:.2f})'
                     save_path = os.path.join(
                         file_path_prefix,
                         model_file
@@ -184,9 +184,9 @@ train file path = {train_upstream_file}""")
                                                               dev_data_list)
         oracle_score, pr, rec, f1 = c_scorer.fever_doc_only(dev_data_list, dev_data_list, max_evidence=5)
 
-        epoch_log += f"Dev(raw_acc/pr/rec/f1):{oracle_score}/{pr}/{rec}/{f1} - "
-        epoch_log += f"Strict score: {oracle_score} - "
-        epoch_log += f"Eval Tracking score: {oracle_score} - "
+        epoch_log += f"Dev(raw_acc/pr/rec/f1):{oracle_score:.2f}/{pr:.2f}/{rec:.2f}/{f1:.2f} - "
+        epoch_log += f"Strict score: {oracle_score:.2f} - "
+        epoch_log += f"Eval Tracking score: {oracle_score:.2f} - "
 
         need_save = False
         if oracle_score > best_dev or i_epoch == num_epoch - 1:
@@ -199,7 +199,7 @@ train file path = {train_upstream_file}""")
                 epoch_log += f"remove model {saved_models.pop(0)} to keep {n_models} limits - "
 
             model_file = f'i({iteration})_epoch({i_epoch})_' \
-                        f'(tra_score:{oracle_score}|pr:{pr}|rec:{rec}|f1:{f1})'
+                        f'(tra_score:{oracle_score:.f2}|pr:{pr:.2f}|rec:{rec:.2f}|f1:{f1:.2f})'
             save_path = os.path.join(
                 file_path_prefix,
                 model_file

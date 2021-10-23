@@ -104,7 +104,7 @@ train file path = {train_upstream_file}""")
 
         # Resampling
         complete_upstream_train_data = get_full_list(config.T_FEVER_TRAIN_JSONL, train_data_list, pred=False)[:2000]
-        epoch_log += f"Sample Prob.: {keep_neg_sample_prob} - "
+        epoch_log += f"Sample Prob.: {keep_neg_sample_prob:.2f} - "
         filtered_train_data = post_filter(complete_upstream_train_data, keep_prob=keep_neg_sample_prob,
                                           seed=12 + i_epoch)
         # Change the seed to avoid duplicate sample...
@@ -147,9 +147,9 @@ train file path = {train_upstream_file}""")
                 hit = eval_mode['check_sent_id_correct_hits']
                 tracking_score = hit / total
 
-                iter_log += f"Dev(raw_acc/pr/rec/f1):{acc_score}/{pr}/{rec}/{f1}/ - "
-                iter_log += f"Strict score: {strict_score} - "
-                iter_log += f"Eval Tracking score: {tracking_score} -"
+                iter_log += f"Dev(raw_acc/pr/rec/f1):{acc_score:.2f}/{pr:.2f}/{rec:.2f}/{f1:.2f}/ - "
+                iter_log += f"Strict score: {strict_score:.2f} - "
+                iter_log += f"Eval Tracking score: {tracking_score:.2f} -"
 
                 need_save = False
                 if tracking_score > best_dev:
@@ -162,7 +162,7 @@ train file path = {train_upstream_file}""")
                         iter_log += f"remove model {saved_models.pop(0)} to keep {n_models} limits - "
 
                     model_file = f'i({iteration})_epoch({i_epoch})_' \
-                        f'(tra_score:{tracking_score}|raw_acc:{acc_score}|pr:{pr}|rec:{rec}|f1:{f1})'
+                        f'(tra_score:{tracking_score:.2f}|raw_acc:{acc_score:.2f}|pr:{pr:.2f}|rec:{rec:.2f}|f1:{f1:.2f})'
 
                     save_path = os.path.join(
                         file_path_prefix,
@@ -189,9 +189,9 @@ train file path = {train_upstream_file}""")
         hit = eval_mode['check_sent_id_correct_hits']
         tracking_score = hit / total
 
-        epoch_log += f"Dev(raw_acc/pr/rec/f1):{acc_score}/{pr}/{rec}/{f1}/ - "
-        epoch_log += f"Strict score: {strict_score} - "
-        epoch_log += f"Eval Tracking score: {tracking_score} - "
+        epoch_log += f"Dev(raw_acc/pr/rec/f1):{acc_score:.2f}/{pr:.2f}/{rec:.2f}/{f1:.2f}/ - "
+        epoch_log += f"Strict score: {strict_score:.2f} - "
+        epoch_log += f"Eval Tracking score: {tracking_score:.2f} - "
 
         if tracking_score > best_dev or i_epoch == num_epoch - 1:
             best_dev = tracking_score
@@ -201,7 +201,7 @@ train file path = {train_upstream_file}""")
                 epoch_log += f"remove model {saved_models.pop(0)} to keep {n_models} limits - "
 
             model_file = f'i({iteration})_epoch({i_epoch})_' \
-                f'(tra_score:{tracking_score}|raw_acc:{acc_score}|pr:{pr}|rec:{rec}|f1:{f1})'
+                f'(tra_score:{tracking_score:.2f}|raw_acc:{acc_score:.2f}|pr:{pr:.2f}|rec:{rec:.2f}|f1:{f1:.2f})'
 
             save_path = os.path.join(
                 file_path_prefix,
