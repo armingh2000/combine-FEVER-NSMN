@@ -32,8 +32,8 @@ pn_ration = {pn_ratio}""")
     logger.info(f"""dev file path = {dev_upstream_file}
 train file path = {train_upstream_file}""")
 
-    dev_data_list = common.load_jsonl(dev_upstream_file)[:1000]
-    train_data_list = common.load_jsonl(train_upstream_file)[:2000]
+    dev_data_list = common.load_jsonl(dev_upstream_file)[:100]
+    train_data_list = common.load_jsonl(train_upstream_file)[:200]
 
     # Prepare Data
     token_indexers = {
@@ -176,7 +176,7 @@ train file path = {train_upstream_file}""")
 
         #
         end = datetime.now()
-        epoch_log += f"epoch time: {end - start} - "
+        epoch_log += f"epoch time: {str(end - start)[:-7]} - "
         eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
         complete_upstream_dev_data = hidden_eval(model, eval_iter, complete_upstream_dev_data)
 
