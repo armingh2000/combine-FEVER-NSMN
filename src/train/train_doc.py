@@ -199,7 +199,7 @@ train file path = {train_upstream_file}""")
                 epoch_log += f"remove model {saved_models.pop(0)} to keep {n_models} limits - "
 
             model_file = f'i({iteration})_epoch({i_epoch})_' \
-                        f'(tra_score:{oracle_score:.f2}|pr:{pr:.2f}|rec:{rec:.2f}|f1:{f1:.2f})'
+                        f'(tra_score:{oracle_score:.2f}|pr:{pr:.2f}|rec:{rec:.2f}|f1:{f1:.2f})'
             save_path = os.path.join(
                 file_path_prefix,
                 model_file
