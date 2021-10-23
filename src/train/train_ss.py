@@ -177,7 +177,7 @@ train file path = {train_upstream_file}""")
                 logger.info(iter_log)
 
         end = datetime.now()
-        epoch_log += f"epoch time: {end - start} - "
+        epoch_log += f"epoch time: {str(end - start)[:-7]} - "
         eval_iter = dev_biterator(dev_instances, shuffle=False, num_epochs=1, cuda_device=device_num)
         complete_upstream_dev_data = hidden_eval(model, eval_iter, complete_upstream_dev_data)
 
