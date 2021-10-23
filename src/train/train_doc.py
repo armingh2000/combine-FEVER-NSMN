@@ -32,8 +32,8 @@ pn_ration = {pn_ratio}""")
     logger.info(f"""dev file path = {dev_upstream_file}
 train file path = {train_upstream_file}""")
 
-    dev_data_list = common.load_jsonl(dev_upstream_file)[:100]
-    train_data_list = common.load_jsonl(train_upstream_file)[:200]
+    dev_data_list = common.load_jsonl(dev_upstream_file)#[:100]
+    train_data_list = common.load_jsonl(train_upstream_file)#[:200]
 
     # Prepare Data
     token_indexers = {
